@@ -1,0 +1,47 @@
+import { tool } from '@langchain/core/tools';
+import { z } from 'zod';
+import { CampaignsService } from '../../campaigns/campaigns.service';
+
+export function createLaunchCampaignTool(campaignsService: CampaignsService) {
+  const launchSchema = z.object({
+    name: z.string().describe('Campaign name'),
+    segmentId: z.string().describe('Target segment ID'),
+    channel: z.string().describe('Delivery channel: email, whatsapp, sms, or rcs'),
+    messageTemplate: z
+      .string()
+      .describe('Message template with {{customer.*}} variables'),
+    aiPrompt: z
+      .string()
+      .describe('Original natural language prompt that created this campaign'),
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (tool as any)(
+    async (input: z.infer<typeof launchSchema>) => {
+      // Create the campaign
+      const campaign = await campaignsService.create({
+        name: input.name,
+        segmentId: input.segmentId,
+        channel: input.channel,
+        messageTemplate: input.messageTemplate,
+        aiPrompt: input.aiPrompt,
+      });
+
+      // Launch it
+      const launched = await campaignsService.launch(campaign.id);
+
+      return JSON.stringify({
+        campaignId: launched.id,
+        status: launched.status,
+        totalCount: launched.totalCount,
+        message: `Campaign "${launched.name}" launched successfully! ${launched.totalCount} messages are being sent via ${launched.channel}.`,
+      });
+    },
+    {
+      name: 'launch_campaign',
+      description:
+        'Create and launch a campaign. ONLY call this after the user has explicitly confirmed they want to send.',
+      schema: launchSchema,
+    },
+  );
+}
