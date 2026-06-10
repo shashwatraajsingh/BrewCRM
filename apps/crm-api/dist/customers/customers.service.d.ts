@@ -10,7 +10,7 @@ export declare class CustomersService {
     private readonly customerRepo;
     constructor(customerRepo: Repository<Customer>);
     findAll(options: FindAllOptions): Promise<{
-        customers: Customer[];
+        data: Customer[];
         total: number;
     }>;
     findOne(id: string): Promise<Customer>;

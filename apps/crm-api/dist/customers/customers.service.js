@@ -40,7 +40,7 @@ let CustomersService = class CustomersService {
             qb.offset(options.offset);
         }
         const customers = await qb.getMany();
-        return { customers, total };
+        return { data: customers, total };
     }
     async findOne(id) {
         const customer = await this.customerRepo.findOne({

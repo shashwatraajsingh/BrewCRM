@@ -17,7 +17,7 @@ export class CustomersService {
     private readonly customerRepo: Repository<Customer>,
   ) {}
 
-  async findAll(options: FindAllOptions): Promise<{ customers: Customer[]; total: number }> {
+  async findAll(options: FindAllOptions): Promise<{ data: Customer[]; total: number }> {
     const qb = this.customerRepo.createQueryBuilder('customer');
 
     if (options.status) {
@@ -43,7 +43,7 @@ export class CustomersService {
 
     const customers = await qb.getMany();
 
-    return { customers, total };
+    return { data: customers, total };
   }
 
   async findOne(id: string): Promise<Customer> {

@@ -13,7 +13,7 @@ export declare class CustomersController {
         avgOrderCount: number;
     }>;
     findAll(status?: string, channel?: string, limit?: string, offset?: string): Promise<{
-        customers: import("./customer.entity").Customer[];
+        data: import("./customer.entity").Customer[];
         total: number;
     }>;
     findOne(id: string): Promise<import("./customer.entity").Customer>;
