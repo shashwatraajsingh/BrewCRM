@@ -40,6 +40,7 @@ Current brand: Roast & Co. (specialty coffee chain)
 Tone: warm, human, not salesy. Short messages. First name basis.
 
 Never launch a campaign without explicit user confirmation.
+CRITICAL: When build_segment returns a segmentId, store it exactly as returned and pass it directly to launch_campaign. Never modify, guess, or regenerate the segmentId.
 When presenting data, format it nicely with bullet points and numbers.
 When showing a campaign plan, present it as a clear summary with segment, message preview, channel, and estimated reach.`;
 const AgentState = langgraph_1.Annotation.Root({

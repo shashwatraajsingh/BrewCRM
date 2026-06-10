@@ -13,9 +13,12 @@ function createLaunchCampaignTool(campaignsService) {
             .describe('Message template with {{customer.*}} variables'),
         aiPrompt: zod_1.z
             .string()
+            .optional()
+            .nullable()
             .describe('Original natural language prompt that created this campaign'),
     });
     return tools_1.tool(async (input) => {
+        console.log('[launch_campaign] Input received:', input);
         const campaign = await campaignsService.create({
             name: input.name,
             segmentId: input.segmentId,
@@ -32,7 +35,7 @@ function createLaunchCampaignTool(campaignsService) {
         });
     }, {
         name: 'launch_campaign',
-        description: 'Create and launch a campaign. ONLY call this after the user has explicitly confirmed they want to send.',
+        description: 'Create and launch a campaign. ONLY call this after the user has explicitly confirmed they want to send.\nThe segmentId MUST come from the exact value returned by build_segment tool.\nDo not generate or modify it.',
         schema: launchSchema,
     });
 }

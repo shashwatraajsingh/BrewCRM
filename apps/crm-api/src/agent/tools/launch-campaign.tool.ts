@@ -12,12 +12,15 @@ export function createLaunchCampaignTool(campaignsService: CampaignsService) {
       .describe('Message template with {{customer.*}} variables'),
     aiPrompt: z
       .string()
+      .optional()
+      .nullable()
       .describe('Original natural language prompt that created this campaign'),
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
     async (input: z.infer<typeof launchSchema>) => {
+      console.log('[launch_campaign] Input received:', input);
       // Create the campaign
       const campaign = await campaignsService.create({
         name: input.name,
@@ -40,7 +43,7 @@ export function createLaunchCampaignTool(campaignsService: CampaignsService) {
     {
       name: 'launch_campaign',
       description:
-        'Create and launch a campaign. ONLY call this after the user has explicitly confirmed they want to send.',
+        'Create and launch a campaign. ONLY call this after the user has explicitly confirmed they want to send.\nThe segmentId MUST come from the exact value returned by build_segment tool.\nDo not generate or modify it.',
       schema: launchSchema,
     },
   );
