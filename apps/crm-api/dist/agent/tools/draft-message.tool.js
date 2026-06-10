@@ -17,6 +17,7 @@ function createDraftMessageTool() {
         tone: zod_1.z
             .string()
             .optional()
+            .nullable()
             .describe('Desired tone (default: warm, human, not salesy)'),
         sampleCustomers: zod_1.z
             .array(zod_1.z.object({

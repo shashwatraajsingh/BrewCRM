@@ -15,6 +15,7 @@ export function createDraftMessageTool() {
     tone: z
       .string()
       .optional()
+      .nullable()
       .describe('Desired tone (default: warm, human, not salesy)'),
     sampleCustomers: z
       .array(
