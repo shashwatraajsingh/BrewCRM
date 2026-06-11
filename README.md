@@ -1,6 +1,6 @@
 # BrewCRM: AI-Native Mini CRM
 
-An AI-native CRM built for the [**Xeno Engineering Take-Home Assignment**](./Xeno%20Engineering%20Internship%20Assignment%20-%202026-1.pdf). 
+An AI-native CRM built for the **Xeno Engineering Take-Home Assignment**. 
 BrewCRM is designed for a fictional specialty coffee chain ("Roast & Co.") to help marketers intelligently reach their shoppers through personalized, data-driven campaigns via a chat-first experience.
 
 ## 🔗 Live Demo
