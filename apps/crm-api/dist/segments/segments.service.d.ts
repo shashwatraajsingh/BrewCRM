@@ -24,5 +24,6 @@ export declare class SegmentsService {
     remove(id: string): Promise<void>;
     refreshCount(id: string): Promise<Segment>;
     resolveCustomers(rules: SegmentRule[]): Promise<Customer[]>;
+    resolveCustomersSorted(rules: SegmentRule[], sortBy: string, sortOrder: 'ASC' | 'DESC', limit: number): Promise<Customer[]>;
     private applyRule;
 }

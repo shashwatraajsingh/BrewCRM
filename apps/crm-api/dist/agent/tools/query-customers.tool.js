@@ -19,7 +19,17 @@ function createQueryCustomersTool(segmentsService) {
             .optional()
             .nullable()
             .describe('Filters to apply when querying customers'),
-        limit: zod_1.z.number().optional().nullable().default(10).describe('Max number of sample customers to return'),
+        sortBy: zod_1.z
+            .string()
+            .optional()
+            .nullable()
+            .describe('Field to sort by: totalOrders, totalSpent, lastOrderAt, name. Default: totalOrders'),
+        sortOrder: zod_1.z
+            .string()
+            .optional()
+            .nullable()
+            .describe('Sort direction: asc or desc. Default: desc'),
+        limit: zod_1.z.number().optional().nullable().default(10).describe('Max number of customers to return (1-50). Default 10.'),
     });
     return tools_1.tool(async (input) => {
         const rules = [];
@@ -49,31 +59,39 @@ function createQueryCustomersTool(segmentsService) {
                 rules.push({ field: 'daysSinceLastOrder', operator: 'days_ago_lte', value: input.filters.daysSinceLastOrderLte });
             }
         }
-        const customers = await segmentsService.resolveCustomers(rules);
-        const limit = input.limit || 10;
-        const sample = customers.slice(0, limit);
-        const totalSpent = customers.reduce((sum, c) => sum + Number(c.totalSpent), 0);
-        const totalOrdersSum = customers.reduce((sum, c) => sum + c.totalOrders, 0);
+        const sortField = input.sortBy || 'totalOrders';
+        const sortDir = (input.sortOrder?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC');
+        const limit = Math.min(Math.max(input.limit || 10, 1), 50);
+        const customers = await segmentsService.resolveCustomersSorted(rules, sortField, sortDir, limit);
+        const allCustomers = await segmentsService.resolveCustomers(rules);
+        const totalCount = allCustomers.length;
+        const totalSpent = allCustomers.reduce((sum, c) => sum + Number(c.totalSpent), 0);
+        const totalOrdersSum = allCustomers.reduce((sum, c) => sum + c.totalOrders, 0);
+        const formatCustomer = (c) => ({
+            id: c.id,
+            name: c.name,
+            email: c.email,
+            phone: c.phone,
+            status: c.status,
+            totalOrders: c.totalOrders,
+            totalSpent: Number(c.totalSpent),
+            preferredChannel: c.preferredChannel,
+            daysSinceLastOrder: c.lastOrderAt
+                ? Math.floor((Date.now() - new Date(c.lastOrderAt).getTime()) / (1000 * 60 * 60 * 24))
+                : null,
+        });
         return JSON.stringify({
-            total: customers.length,
-            avgSpent: customers.length > 0 ? Math.round(totalSpent / customers.length) : 0,
-            avgOrders: customers.length > 0 ? Math.round((totalOrdersSum / customers.length) * 10) / 10 : 0,
-            customers: sample.map((c) => ({
-                id: c.id,
-                name: c.name,
-                email: c.email,
-                status: c.status,
-                totalOrders: c.totalOrders,
-                totalSpent: Number(c.totalSpent),
-                preferredChannel: c.preferredChannel,
-                daysSinceLastOrder: c.lastOrderAt
-                    ? Math.floor((Date.now() - new Date(c.lastOrderAt).getTime()) / (1000 * 60 * 60 * 24))
-                    : null,
-            })),
+            totalMatchingCustomers: totalCount,
+            avgSpent: totalCount > 0 ? Math.round(totalSpent / totalCount) : 0,
+            avgOrders: totalCount > 0 ? Math.round((totalOrdersSum / totalCount) * 10) / 10 : 0,
+            sortedBy: sortField,
+            sortDirection: sortDir,
+            returnedCount: customers.length,
+            customers: customers.map(formatCustomer),
         });
     }, {
         name: 'query_customers',
-        description: 'Query the customer database with filters. Returns customer stats and sample data.',
+        description: 'Query the customer database with filters, sorting, and limit. Use this to find top customers, loyal customers, at-risk customers, etc. Always returns full customer details including name, email, phone, and order history.',
         schema: querySchema,
     });
 }

@@ -5,54 +5,11 @@
   },
   {
     "_type": "human",
-    "content": "find 5 most loyal customer"
+    "content": "Show me the top 5 customers with the most orders, include their names, emails, order counts and total spent"
   },
   {
     "_type": "ai",
-    "content": "These are some of your most loyal customers! What would you like to do with this information? I can help you:\n\n*   **Create a segment** based on their characteristics (e.g., \"High-Value Customers\").\n*   **Draft a message** to thank them or offer a special reward.\n*   **Analyze their behavior** further (e.g., \"What's their preferred channel?\").",
-    "tool_calls": []
-  },
-  {
-    "_type": "human",
-    "content": "top 5 cutomer who has bought from us the mostt"
-  },
-  {
-    "_type": "ai",
-    "content": [
-      {
-        "functionCall": {
-          "name": "query_customers",
-          "args": {
-            "limit": 5,
-            "filters": {
-              "minOrders": 20
-            }
-          }
-        },
-        "thoughtSignature": "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"
-      }
-    ],
-    "tool_calls": [
-      {
-        "name": "query_customers",
-        "args": {
-          "limit": 5,
-          "filters": {
-            "minOrders": 20
-          }
-        },
-        "type": "tool_call"
-      }
-    ]
-  },
-  {
-    "_type": "tool",
-    "content": "{\"total\":2,\"avgSpent\":10543,\"avgOrders\":24,\"customers\":[{\"id\":\"2482a47a-036f-416d-91a1-a71c4d638a4c\",\"name\":\"Pari Gupta\",\"email\":\"parigupta@yahoo.com\",\"status\":\"active\",\"totalOrders\":26,\"totalSpent\":11307,\"preferredChannel\":\"whatsapp\",\"daysSinceLastOrder\":53},{\"id\":\"4467f881-f161-4d96-b228-1c8b38986744\",\"name\":\"Nikhil Menon\",\"email\":\"nikhilmenon@gmail.com\",\"status\":\"active\",\"totalOrders\":22,\"totalSpent\":9779,\"preferredChannel\":\"whatsapp\",\"daysSinceLastOrder\":25}]}",
-    "name": "query_customers"
-  },
-  {
-    "_type": "ai",
-    "content": "These are your top 2 customers who have bought from you the most:\n\n*   **Pari Gupta**: 26 orders, total spent $11307, last ordered 53 days ago, prefers WhatsApp.\n*   **Nikhil Menon**: 22 orders, total spent $9779, last ordered 25 days ago, prefers WhatsApp.\n\nIt looks like you only have 2 customers who have placed more than 20 orders. Would you like to:\n\n1.  **See more customers** with slightly lower order counts?\n2.  **Create a segment** for these top customers?\n3.  **Draft a message** to thank them?",
+    "content": "I can only query customers based on certain filters, but I can't sort them by the number of orders or retrieve their email addresses directly. I can show you a sample of customers and their order counts, but not necessarily the \"top\" ones.",
     "tool_calls": []
   }
 ]

@@ -99,6 +99,34 @@ export class SegmentsService {
     return qb.getMany();
   }
 
+  /**
+   * Like resolveCustomers but with ORDER BY and LIMIT applied at the SQL level.
+   */
+  async resolveCustomersSorted(
+    rules: SegmentRule[],
+    sortBy: string,
+    sortOrder: 'ASC' | 'DESC',
+    limit: number,
+  ): Promise<Customer[]> {
+    const qb = this.customerRepo.createQueryBuilder('customer');
+    let paramIndex = 0;
+
+    for (const rule of rules) {
+      paramIndex++;
+      const paramName = `p${paramIndex}`;
+      this.applyRule(qb, rule, paramName);
+    }
+
+    // Validate sortBy to prevent SQL injection
+    const allowedSortFields = ['totalOrders', 'totalSpent', 'lastOrderAt', 'name', 'createdAt'];
+    const safeSortBy = allowedSortFields.includes(sortBy) ? sortBy : 'totalOrders';
+
+    qb.orderBy(`customer.${safeSortBy}`, sortOrder);
+    qb.limit(limit);
+
+    return qb.getMany();
+  }
+
   private applyRule(
     qb: SelectQueryBuilder<Customer>,
     rule: SegmentRule,

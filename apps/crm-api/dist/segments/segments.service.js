@@ -78,6 +78,20 @@ let SegmentsService = class SegmentsService {
         }
         return qb.getMany();
     }
+    async resolveCustomersSorted(rules, sortBy, sortOrder, limit) {
+        const qb = this.customerRepo.createQueryBuilder('customer');
+        let paramIndex = 0;
+        for (const rule of rules) {
+            paramIndex++;
+            const paramName = `p${paramIndex}`;
+            this.applyRule(qb, rule, paramName);
+        }
+        const allowedSortFields = ['totalOrders', 'totalSpent', 'lastOrderAt', 'name', 'createdAt'];
+        const safeSortBy = allowedSortFields.includes(sortBy) ? sortBy : 'totalOrders';
+        qb.orderBy(`customer.${safeSortBy}`, sortOrder);
+        qb.limit(limit);
+        return qb.getMany();
+    }
     applyRule(qb, rule, paramName) {
         const { field, operator, value } = rule;
         if (field === 'daysSinceLastOrder') {

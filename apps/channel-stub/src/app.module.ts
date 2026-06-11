@@ -16,12 +16,25 @@ import { StubQueueModule } from './queue/queue.module';
       useFactory: (config: ConfigService) => {
         const redisUrl = config.get<string>('UPSTASH_REDIS_URL');
         if (redisUrl) {
-          return { redis: redisUrl };
+          const url = new URL(redisUrl);
+          return {
+            redis: {
+              host: url.hostname,
+              port: Number(url.port),
+              username: url.username || undefined,
+              password: url.password || undefined,
+              tls: url.protocol === 'rediss:' ? {} : undefined,
+              maxRetriesPerRequest: null,
+              enableReadyCheck: false,
+            },
+          };
         }
         return {
           redis: {
             host: config.get<string>('REDIS_HOST', 'localhost'),
             port: config.get<number>('REDIS_PORT', 6379),
+            maxRetriesPerRequest: null,
+            enableReadyCheck: false,
           },
         };
       },
