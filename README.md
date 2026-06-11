@@ -3,13 +3,16 @@
 An AI-native CRM built for the **Xeno Engineering Take-Home Assignment**. 
 BrewCRM is designed for a fictional specialty coffee chain ("Roast & Co.") to help marketers intelligently reach their shoppers through personalized, data-driven campaigns via a chat-first experience.
 
+## 🔗 Live Demo
+[brewcrm.your-domain.com](https://your-url) · [Backend API](https://api-url)
+
 ## 🎯 The Challenge & Approach
 
 The assignment required building a system to ingest data, segment shoppers, send personalized communications, and track performance using a stubbed channel service—all while being deeply "AI-native."
 
 Instead of bolting an AI chatbot onto a traditional SaaS interface, **BrewCRM is built as a true AI agent (Co-pilot).** The marketer describes their intent in natural language (e.g., *"Send a WhatsApp thank you message to my top 5 most loyal customers"*), and the AI autonomously handles the data querying, segmentation, copywriting, reach estimation, and campaign launch.
 
-## ✨ Core Features (Assignment Requirements)
+## ✨ Features
 
 1. **Data Ingestion & Modeling**
    - Pre-seeded with 500 realistic customers and their purchase histories (orders, total spent, last order dates, preferred channels).
@@ -55,3 +58,9 @@ The AI Co-pilot doesn't just generate text; it acts as an orchestration layer ov
 - **Queue Separation**: Both the CRM and the Channel Stub have their own isolated BullMQ queues. This ensures that if the channel provider experiences latency or goes down, the CRM's outbound queue safely buffers the outgoing messages.
 - **Callback Retries**: The `channel-stub` implements exponential backoff when hitting the CRM's receipt API to ensure no analytics events are lost due to transient network failures.
 - **AI Rate Limiting**: The system limits sample sizes sent to the LLM context window to prevent token overflow while maintaining accurate segmentation via backend SQL execution.
+
+## 🚫 Conscious Scope Decisions
+- No auth/login — out of scope for a demo CRM
+- No multi-tenancy — single brand (Roast & Co.) by design
+- No real messaging provider — channel stub models the full async lifecycle
+- No mobile responsive design — marketers use desktop
