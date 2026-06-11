@@ -20,25 +20,32 @@ export function createLaunchCampaignTool(campaignsService: CampaignsService) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tool as any)(
     async (input: z.infer<typeof launchSchema>) => {
-      console.log('[launch_campaign] Input received:', input);
-      // Create the campaign
-      const campaign = await campaignsService.create({
-        name: input.name,
-        segmentId: input.segmentId,
-        channel: input.channel,
-        messageTemplate: input.messageTemplate,
-        aiPrompt: input.aiPrompt,
-      });
+      require('fs').appendFileSync('launch-debug.log', JSON.stringify({ event: 'INPUT', input }) + '\n');
+      try {
+        // Create the campaign
+        const campaign = await campaignsService.create({
+          name: input.name,
+          segmentId: input.segmentId,
+          channel: input.channel,
+          messageTemplate: input.messageTemplate,
+          aiPrompt: input.aiPrompt || undefined,
+        });
 
-      // Launch it
-      const launched = await campaignsService.launch(campaign.id);
-
-      return JSON.stringify({
-        campaignId: launched.id,
-        status: launched.status,
-        totalCount: launched.totalCount,
-        message: `Campaign "${launched.name}" launched successfully! ${launched.totalCount} messages are being sent via ${launched.channel}.`,
-      });
+        // Launch it
+        const launched = await campaignsService.launch(campaign.id);
+        
+        const result = JSON.stringify({
+          campaignId: launched.id,
+          status: launched.status,
+          totalCount: launched.totalCount,
+          message: `Campaign "${launched.name}" launched successfully! ${launched.totalCount} messages are being sent via ${launched.channel}.`,
+        });
+        require('fs').appendFileSync('launch-debug.log', JSON.stringify({ event: 'SUCCESS', result }) + '\n');
+        return result;
+      } catch (err: any) {
+        require('fs').appendFileSync('launch-debug.log', JSON.stringify({ event: 'ERROR', error: err.message, stack: err.stack }) + '\n');
+        throw err;
+      }
     },
     {
       name: 'launch_campaign',

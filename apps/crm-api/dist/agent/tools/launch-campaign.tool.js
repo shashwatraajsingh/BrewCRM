@@ -18,21 +18,29 @@ function createLaunchCampaignTool(campaignsService) {
             .describe('Original natural language prompt that created this campaign'),
     });
     return tools_1.tool(async (input) => {
-        console.log('[launch_campaign] Input received:', input);
-        const campaign = await campaignsService.create({
-            name: input.name,
-            segmentId: input.segmentId,
-            channel: input.channel,
-            messageTemplate: input.messageTemplate,
-            aiPrompt: input.aiPrompt,
-        });
-        const launched = await campaignsService.launch(campaign.id);
-        return JSON.stringify({
-            campaignId: launched.id,
-            status: launched.status,
-            totalCount: launched.totalCount,
-            message: `Campaign "${launched.name}" launched successfully! ${launched.totalCount} messages are being sent via ${launched.channel}.`,
-        });
+        require('fs').appendFileSync('launch-debug.log', JSON.stringify({ event: 'INPUT', input }) + '\n');
+        try {
+            const campaign = await campaignsService.create({
+                name: input.name,
+                segmentId: input.segmentId,
+                channel: input.channel,
+                messageTemplate: input.messageTemplate,
+                aiPrompt: input.aiPrompt || undefined,
+            });
+            const launched = await campaignsService.launch(campaign.id);
+            const result = JSON.stringify({
+                campaignId: launched.id,
+                status: launched.status,
+                totalCount: launched.totalCount,
+                message: `Campaign "${launched.name}" launched successfully! ${launched.totalCount} messages are being sent via ${launched.channel}.`,
+            });
+            require('fs').appendFileSync('launch-debug.log', JSON.stringify({ event: 'SUCCESS', result }) + '\n');
+            return result;
+        }
+        catch (err) {
+            require('fs').appendFileSync('launch-debug.log', JSON.stringify({ event: 'ERROR', error: err.message, stack: err.stack }) + '\n');
+            throw err;
+        }
     }, {
         name: 'launch_campaign',
         description: 'Create and launch a campaign. ONLY call this after the user has explicitly confirmed they want to send.\nThe segmentId MUST come from the exact value returned by build_segment tool.\nDo not generate or modify it.',

@@ -66,6 +66,10 @@ let AgentService = AgentService_1 = class AgentService {
         const llmWithTools = llm.bindTools(tools);
         const agentNode = async (state) => {
             const response = await llmWithTools.invoke(state.messages);
+            require('fs').appendFileSync('llm-debug.log', JSON.stringify({
+                tool_calls: response.tool_calls,
+                content: response.content
+            }) + '\n');
             return { messages: [response] };
         };
         const toolNode = new prebuilt_1.ToolNode(tools);
@@ -97,6 +101,12 @@ let AgentService = AgentService_1 = class AgentService {
         const result = await graph.invoke({
             messages: langchainMessages,
         });
+        require('fs').writeFileSync('debug-agent.json', JSON.stringify(result.messages.map(m => ({
+            _type: m._getType(),
+            content: m.content,
+            tool_calls: m.tool_calls,
+            name: m.name
+        })), null, 2));
         const allMessages = result.messages;
         const toolCalls = [];
         let campaignLaunched;

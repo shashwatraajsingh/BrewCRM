@@ -75,6 +75,10 @@ export class AgentService {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const agentNode = async (state: any) => {
       const response = await llmWithTools.invoke(state.messages);
+      require('fs').appendFileSync('llm-debug.log', JSON.stringify({ 
+        tool_calls: response.tool_calls, 
+        content: response.content 
+      }) + '\n');
       return { messages: [response] };
     };
 
@@ -119,6 +123,13 @@ export class AgentService {
     const result = await graph.invoke({
       messages: langchainMessages,
     });
+    
+    require('fs').writeFileSync('debug-agent.json', JSON.stringify(result.messages.map(m => ({
+      _type: m._getType(),
+      content: m.content,
+      tool_calls: (m as any).tool_calls,
+      name: m.name
+    })), null, 2));
 
     // Extract the final response and tool calls
     const allMessages = result.messages as BaseMessage[];
