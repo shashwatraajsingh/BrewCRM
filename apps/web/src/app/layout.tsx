@@ -21,11 +21,16 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={inter.className}>
         <Providers>
-          <div className="flex h-screen overflow-hidden">
-            <Sidebar />
-            <main className="flex-1 overflow-y-auto">
-              {children}
-            </main>
+          <div className="flex flex-col h-screen overflow-hidden">
+            <div className="bg-amber-500/20 text-amber-200 text-xs text-center py-1.5 border-b border-amber-500/30 font-medium">
+              ⚠️ Note: The backend is deployed on Render's free tier. It may take 1-2 minutes to wake up from inactivity.
+            </div>
+            <div className="flex flex-1 overflow-hidden">
+              <Sidebar />
+              <main className="flex-1 overflow-y-auto">
+                {children}
+              </main>
+            </div>
           </div>
           <Toaster theme="dark" position="top-right" />
         </Providers>
